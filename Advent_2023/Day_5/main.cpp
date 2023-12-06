@@ -1,8 +1,9 @@
 #include <limits.h>
 #include <omp.h>
-#include <thread>
+
 #include <iostream>
 #include <map>
+#include <thread>
 #include <vector>
 
 enum Map_Classification {
@@ -38,6 +39,14 @@ long destination_start = 0;
 long source_range_start = 0;
 long range_lenght = 0;
 
+void update_map(const std::pair<long, long> k_v, std::map<long, long> &map) {
+    if (k_v.second >= source_range_start && k_v.second < source_range_start + range_lenght) {
+        map[k_v.first] = destination_start + k_v.second - source_range_start;
+    } else if (map[k_v.first] == 0) {
+        map[k_v.first] = k_v.second;
+    }
+}
+
 void solve_part_1(std::string line, std::vector<long> &seeds) {
     if (line == "") {
         return;
@@ -63,65 +72,38 @@ void solve_part_1(std::string line, std::vector<long> &seeds) {
         switch (Actual_Classification) {
             case Seed_Soil:
                 for (auto seed : seeds) {
-                    if (seed >= source_range_start && seed < source_range_start + range_lenght) {
-                        Seed_Soil_Map[seed] = destination_start + seed - source_range_start;
-                    } else if (Seed_Soil_Map[seed] == 0) {
-                        Seed_Soil_Map[seed] = seed;
-                    }
+                    std::pair<long, long> p(seed, seed);
+                    update_map(p, Seed_Soil_Map);
                 }
                 break;
             case Soil_Fertilizer:
                 for (auto s_s_m : Seed_Soil_Map) {
-                    if (s_s_m.second >= source_range_start && s_s_m.second < source_range_start + range_lenght) {
-                        Soil_Fertilizer_Map[s_s_m.first] = destination_start + s_s_m.second - source_range_start;
-                    } else if (Soil_Fertilizer_Map[s_s_m.first] == 0) {
-                        Soil_Fertilizer_Map[s_s_m.first] = s_s_m.second;
-                    }
+                    update_map(s_s_m, Soil_Fertilizer_Map);
                 }
                 break;
             case Fertilizer_Water:
                 for (auto s_f_m : Soil_Fertilizer_Map) {
-                    if (s_f_m.second >= source_range_start && s_f_m.second < source_range_start + range_lenght) {
-                        Fertilizer_Water_Map[s_f_m.first] = destination_start + s_f_m.second - source_range_start;
-                    } else if (Fertilizer_Water_Map[s_f_m.first] == 0) {
-                        Fertilizer_Water_Map[s_f_m.first] = s_f_m.second;
-                    }
+                    update_map(s_f_m, Fertilizer_Water_Map);
                 }
                 break;
             case Water_Light:
                 for (auto f_w_m : Fertilizer_Water_Map) {
-                    if (f_w_m.second >= source_range_start && f_w_m.second < source_range_start + range_lenght) {
-                        Water_Light_Map[f_w_m.first] = destination_start + f_w_m.second - source_range_start;
-                    } else if (Water_Light_Map[f_w_m.first] == 0) {
-                        Water_Light_Map[f_w_m.first] = f_w_m.second;
-                    }
+                    update_map(f_w_m, Water_Light_Map);
                 }
                 break;
             case Light_Temperature:
                 for (auto w_l_m : Water_Light_Map) {
-                    if (w_l_m.second >= source_range_start && w_l_m.second < source_range_start + range_lenght) {
-                        Light_Temperature_Map[w_l_m.first] = destination_start + w_l_m.second - source_range_start;
-                    } else if (Light_Temperature_Map[w_l_m.first] == 0) {
-                        Light_Temperature_Map[w_l_m.first] = w_l_m.second;
-                    }
+                    update_map(w_l_m, Light_Temperature_Map);
                 }
                 break;
             case Temperature_Humidity:
                 for (auto l_t_m : Light_Temperature_Map) {
-                    if (l_t_m.second >= source_range_start && l_t_m.second < source_range_start + range_lenght) {
-                        Temperature_Humidity_Map[l_t_m.first] = destination_start + l_t_m.second - source_range_start;
-                    } else if (Temperature_Humidity_Map[l_t_m.first] == 0) {
-                        Temperature_Humidity_Map[l_t_m.first] = l_t_m.second;
-                    }
+                    update_map(l_t_m, Temperature_Humidity_Map);
                 }
                 break;
             case Humidity_Location:
                 for (auto t_h_m : Temperature_Humidity_Map) {
-                    if (t_h_m.second >= source_range_start && t_h_m.second < source_range_start + range_lenght) {
-                        Humidity_Location_Map[t_h_m.first] = destination_start + t_h_m.second - source_range_start;
-                    } else if (Humidity_Location_Map[t_h_m.first] == 0) {
-                        Humidity_Location_Map[t_h_m.first] = t_h_m.second;
-                    }
+                    update_map(t_h_m, Humidity_Location_Map);
                 }
                 break;
         }
@@ -203,12 +185,13 @@ void load_vectors_of_maps(std::string line, std::vector<std::vector<Map>> &maps)
     }
 }
 
-void process_inner_loop(int i,  const std::vector<long>& seeds, const std::vector<std::vector<Map>> &maps, long &minimal_location) {
+void process_inner_loop(const int i, const std::vector<long> &seeds, const std::vector<std::vector<Map>> &maps, long &minimal_location) {
     for (long j = seeds[i]; j < seeds[i] + seeds[i + 1]; j++) {
-        if (j == (seeds[i] + seeds[i + 1]) / 2){
-            std::cout << "Thread " << " is at " << j << std::endl;
-        }else if (j == seeds[i] + seeds[i + 1] - 1){
-            std::cout << "Thread with initial value " << seeds[i] << " ended" <<std::endl;
+        if (j == (seeds[i] + seeds[i + 1]) / 2) {
+            std::cout << "Thread "
+                      << " is at " << j << std::endl;
+        } else if (j == seeds[i] + seeds[i + 1] - 1) {
+            std::cout << "Thread with initial value " << seeds[i] << " ended" << std::endl;
         }
         long location = j;
         for (auto map : maps) {
@@ -236,9 +219,21 @@ int main() {
     std::string line;
 
     while (getline(std::cin, line)) {
-        // solve_part_1(line, seeds);
+        solve_part_1(line, seeds);
         load_vectors_of_maps(line, maps);
     }
+
+    // Part 1
+    long min_location = LONG_MAX;
+    for (auto h_l_m : Humidity_Location_Map) {
+        if (h_l_m.second < min_location) {
+            min_location = h_l_m.second;
+        }
+    }
+    for (auto seed : seeds) {
+        std::cout << seed << " " << Seed_Soil_Map[seed] << " " << Soil_Fertilizer_Map[seed] << " " << Fertilizer_Water_Map[seed] << " " << Water_Light_Map[seed] << " " << Light_Temperature_Map[seed] << " " << Temperature_Humidity_Map[seed] << " " << Humidity_Location_Map[seed] << std::endl;
+    }
+    std::cout << "Minimal location for part 1 :" << min_location << std::endl;
 
     std::cout << maps.size() << std::endl;
     int size = seeds.size();
@@ -246,26 +241,16 @@ int main() {
     const int num_threads = std::thread::hardware_concurrency();
     std::cout << num_threads << std::endl;
     std::vector<std::thread> threads;
-    //Part 2
+    // Part 2
     for (int i = 0; i < size; i += 2) {
-        std::cout<< "Started " << seeds[i] << " " << seeds[i + 1] << std::endl;
+        std::cout << "Started " << seeds[i] << " " << seeds[i + 1] << std::endl;
         threads.emplace_back(process_inner_loop, i, std::ref(seeds), std::ref(maps), std::ref(minimal_location));
     }
-    for (auto& thread : threads) {
+    for (auto &thread : threads) {
         thread.join();
     }
-    //Part 1
-    // long min_location = LONG_MAX;
-    // for (auto h_l_m : Humidity_Location_Map) {
-    //     if (h_l_m.second < min_location) {
-    //         min_location = h_l_m.second;
-    //     }
-    // }
-    // for(auto seed: seeds){
-    //     std::cout << seed << " " << Seed_Soil_Map[seed] << " " << Soil_Fertilizer_Map[seed] << " " << Fertilizer_Water_Map[seed] << " " << Water_Light_Map[seed] << " " << Light_Temperature_Map[seed] << " " << Temperature_Humidity_Map[seed] << " " << Humidity_Location_Map[seed] << std::endl;
-    // }
 
-    std::cout << minimal_location << std::endl;
+    std::cout << "Minimal location for part 2 :" << minimal_location << std::endl;
 
     return 0;
 }
