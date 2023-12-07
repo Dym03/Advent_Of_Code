@@ -1,12 +1,15 @@
 #include "../../Utils/utils.cpp"
+#include <algorithm>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <set>
-#include <type_traits>
 #include <vector>
 
+std::map<char, int> card_to_value;
+
 void init_card_to_value(std::map<char, int> &map) {
-  for (int i = '2'; i < '9'; i++) {
+  for (int i = '2'; i <= '9'; i++) {
     map[i] = (i - '0');
   }
   map['T'] = 10;
@@ -33,12 +36,29 @@ struct Hand {
   Hand_Type type;
 };
 
+struct type_comp {
+  // Operator() overloading
+  bool operator()(const Hand &h1, const Hand &h2) {
+    // new definition
+    if (h1.type != h2.type) {
+      return h1.type < h2.type;
+    } else {
+      for (int i = 0; i < h1.cards.length(); i++) {
+        if (h1.cards[i] == h2.cards[i]) {
+          continue;
+        } else {
+          return card_to_value[h1.cards[i]] < card_to_value[h2.cards[i]];
+        }
+      }
+      return false;
+    }
+  }
+};
+
 void initialize_set_of_letters(std::string input, std::set<char> &charset) {
   for (auto a : input) {
-    std::cout << a << " ";
     charset.insert(a);
   }
-  std::cout << std::endl;
 }
 
 void analyze_hand_type(Hand &act_hand) {
@@ -74,10 +94,20 @@ void analyze_hand_type(Hand &act_hand) {
 int main() {
   std::string input;
   std::vector<std::string> tokens;
+  std::vector<Hand> hands;
+  init_card_to_value(card_to_value);
   while (getline(std::cin, input)) {
     tokens = split(' ', input);
     Hand act_hand = {std::stoi(tokens[1]), tokens[0]};
     initialize_set_of_letters(tokens[0], act_hand.letters);
     analyze_hand_type(act_hand);
+    hands.emplace_back(act_hand);
   }
+  type_comp tc;
+  std::sort(hands.begin(), hands.end(), tc);
+  long sum = 0;
+  for (int i = 0; i < hands.size(); i++) {
+    sum += hands[i].bet * (i + 1);
+  }
+  std::cout << sum;
 }
