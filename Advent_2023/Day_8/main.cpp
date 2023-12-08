@@ -59,24 +59,19 @@ int main() {
   std::vector<std::string> all_actual_locations;
   while (getline(std::cin, input)) {
     tokens = split('=', input);
-    for (auto token : tokens) {
+    for (auto &token : tokens) {
       trim(token);
     }
-    map_name = tokens[0].substr(0, 3);
+    map_name = tokens[0];
     if (map_name[2] == 'A') {
-      std::cout << map_name << "\n";
       all_actual_locations.push_back(map_name);
     }
     left_right_tokens = split(',', tokens[1]);
-    left_right.first = left_right_tokens[0].substr(2);
+    left_right.first = left_right_tokens[0].substr(1);
     left_right.second = left_right_tokens[1].substr(1, 3);
     map[map_name] = left_right;
   }
-  std::array<long, 6> steps;
-  for (int i = 0; i < steps.size(); i++) {
-    steps[i] = 0;
-  }
-  std::cout << all_actual_locations.size() << "\n";
+  std::array<long, 6> steps{0};
   long counter = 1;
   // Part 1
   // std::string actual_position = "AAA";
@@ -114,12 +109,6 @@ int main() {
         check_all_needed_steps(steps)) {
       std::cout << counter << "\n";
       break;
-    }
-    if (counter % 10000000 == 0) {
-      for (auto a : all_actual_locations) {
-        std::cout << a << " ";
-      }
-      std::cout << "\n";
     }
   }
   for (auto a : steps) {
