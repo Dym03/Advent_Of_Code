@@ -33,6 +33,8 @@ void print_grid(PipeType grid[140][140]) {
     for (int j = 0; j < 140; j++) {
       if (grid[i][j] == path) {
         std::cout << "x";
+      } else if (grid[i][j] == inside_loop) {
+        std::cout << "I";
       } else {
         std::cout << ".";
       }
@@ -285,7 +287,6 @@ int main() {
   if (find_loop(grid, start_pos.first - 1, start_pos.second, up)) {
     std::cout << sum << "\n";
   }
-  print_grid(grid);
   std::cout << "\n";
   int sum_p_2 = 0;
   for (int i = 0; i < 140; i++) {
@@ -295,7 +296,7 @@ int main() {
         tmp.x = i;
         tmp.y = j;
         if (is_inside_route(route_points, tmp)) {
-          std::cout << i << " " << j << "\n";
+          grid[i][j] = inside_loop;
           sum_p_2 += 1;
         }
       } else {
@@ -303,5 +304,6 @@ int main() {
       }
     }
   }
+  print_grid(grid);
   std::cout << route_points.size() << " " << sum_p_2 << "\n";
 }
