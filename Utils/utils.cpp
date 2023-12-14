@@ -37,3 +37,21 @@ std::vector<std::string> split(char delim, std::string input) {
   }
   return tokens;
 }
+
+template <typename T> void print_vector(std::vector<T> inp, bool newline) {
+  for (auto a : inp) {
+    std::cout << a;
+    if (newline) {
+      std::cout << '\n';
+    }
+  }
+  std::cout << '\n';
+}
+
+template <typename T> void print_grid(std::vector<std::vector<T>> grid) {
+  for (auto row : grid) {
+    print_vector(row, false);
+    std::cout << '\n';
+  }
+  std::cout << '\n';
+}
