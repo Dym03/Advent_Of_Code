@@ -1,9 +1,11 @@
+#include "../../Utils/utils.cpp"
 #include <cerrno>
 #include <codecvt>
+#include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
 #include <vector>
-
-#include "../../Utils/utils.cpp"
 
 enum GridTile {
   OvalRock,
@@ -56,9 +58,9 @@ void move_rock_south(std::vector<std::vector<GridTile>> &grid, int row,
 void move_rock_west(std::vector<std::vector<GridTile>> &grid, int row,
                     int col) {
   for (int c = col; c > 0; c--) {
-    if (grid[row][col - 1] == EmptySpace) {
-      grid[row][col] = EmptySpace;
-      grid[row][col - 1] = OvalRock;
+    if (grid[row][c - 1] == EmptySpace) {
+      grid[row][c] = EmptySpace;
+      grid[row][c - 1] = OvalRock;
     } else {
       break;
     }
@@ -68,9 +70,9 @@ void move_rock_west(std::vector<std::vector<GridTile>> &grid, int row,
 void move_rock_east(std::vector<std::vector<GridTile>> &grid, int row,
                     int col) {
   for (int c = col; c < grid[0].size() - 1; c++) {
-    if (grid[row][col + 1] == EmptySpace) {
-      grid[row][col] = EmptySpace;
-      grid[row][col + 1] = OvalRock;
+    if (grid[row][c + 1] == EmptySpace) {
+      grid[row][c] = EmptySpace;
+      grid[row][c + 1] = OvalRock;
     } else {
       break;
     }
@@ -120,7 +122,7 @@ void move_rocks_p2(std::vector<std::vector<GridTile>> &grid, Direction dir) {
       }
     }
   } else if (dir == East) {
-    for (int c = grid[0].size() - 1; c > 0; c--) {
+    for (int c = grid[0].size() - 1; c >= 0; c--) {
       for (int r = 0; r < grid.size(); r++) {
         if (grid[r][c] == OvalRock) {
           move_rock_east(grid, r, c);
@@ -157,6 +159,8 @@ void print_grid(std::vector<std::vector<GridTile>> grid) {
   }
 }
 
+std::multiset<std::vector<std::vector<GridTile>>> setGrids;
+
 int main() {
   std::string input = "";
   std::vector<std::string> lines;
@@ -165,17 +169,35 @@ int main() {
   }
   std::vector<std::vector<GridTile>> grid = initiliaz_grid(lines);
   print_grid(grid);
+  long cyclusy = 1000000000;
+  cyclusy -= 460;
+  int brambora = cyclusy % 280;
+  int pos = 280 - brambora;
+  int cycles = 0;
   Direction dirs[4] = {North, West, South, East};
   std::cout << "\n\n";
+  std::map<int, int> map_preassure_cycles;
+  std::ofstream output("output.txt");
   // Part 1 move_rocks(grid);
-  for (int i = 0; i < 4; i++) {
-    move_rocks_p2(grid, dirs[i]);
-    print_grid(grid);
-    std::cout << "\n\n";
+  for (int r = 0; r < cyclusy; r++) {
+    for (int i = 0; i < 4; i++) {
+      move_rocks_p2(grid, dirs[i]);
+      long preassure = calculate_preassure(grid);
+      output << preassure << " " << ' ' << pos << '\n';
+      if (setGrids.count(grid) == 1) {
+        map_preassure_cycles[preassure] = cycles;
+      }
+      if (setGrids.count(grid) > 1) {
+        output << preassure << " " << cycles << " "
+               << map_preassure_cycles[preassure] << " " << pos << "\n";
+        return 0;
+      }
+      cycles += 1;
+      setGrids.insert(grid);
+      // print_grid(grid);
+      // std::cout << "\n\n";
+    }
   }
-
-  long preassure = calculate_preassure(grid);
-  std::cout << preassure << '\n';
 
   return 0;
 }
