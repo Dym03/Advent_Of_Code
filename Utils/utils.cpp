@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -13,6 +14,16 @@ void rtrim(std::string &input) {
 void trim(std::string &input) {
   ltrim(input);
   rtrim(input);
+}
+
+std::vector<std::string> read_lines() {
+  std::vector<std::string> lines;
+  std::string line;
+  while (getline(std::cin, line)) {
+    lines.push_back(line);
+  }
+
+  return lines;
 }
 
 std::vector<std::string> split(char delim, std::string input) {
