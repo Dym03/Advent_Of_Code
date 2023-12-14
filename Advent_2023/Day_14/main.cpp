@@ -1,11 +1,7 @@
 #include "../../Utils/utils.cpp"
-#include <cerrno>
-#include <codecvt>
 #include <fstream>
-#include <iostream>
 #include <map>
 #include <set>
-#include <type_traits>
 #include <vector>
 
 enum GridTile {
@@ -160,23 +156,18 @@ void print_grid(std::vector<std::vector<GridTile>> grid) {
   }
 }
 
-std::multiset<std::vector<std::vector<GridTile>>> setGrids;
+std::set<std::vector<std::vector<GridTile>>> setGrids;
 
 int main() {
   std::string input = "";
-  std::vector<std::string> lines;
-  while (getline(std::cin, input)) {
-    lines.push_back(input);
-  }
+  std::vector<std::string> lines = read_lines();
+  print_vector(lines, true);
   std::vector<std::vector<GridTile>> grid = initiliaz_grid(lines);
   print_grid(grid);
+
   long cyclusy = 1000000000;
-  int brambora = cyclusy % 7;
-  int pos = 280 - brambora;
   int cycles = 0;
   Direction dirs[4] = {North, West, South, East};
-  std::cout << "\n\n";
-  std::map<int, int> map_preassure_cycles;
   std::map<std::vector<std::vector<GridTile>>, int> first_appearence;
   std::map<int, std::vector<std::vector<GridTile>>> r_to_grid;
   std::ofstream output("output.txt");
@@ -185,15 +176,15 @@ int main() {
   for (int r = 0; r < cyclusy; r++) {
     std::cout << r << ' ' << calculate_preassure(grid) << '\n';
     if (setGrids.count(grid) > 0) {
-      std::cout << r << " " << brambora << " " << first_appearence[grid]
-                << "\n";
       int length = (r - first_appearence[grid]);
       cyclusy -= (r + 1);
       cyclusy %= length;
       std::cout << cyclusy << '\n';
       std::cout << calculate_preassure(
-          r_to_grid[first_appearence[grid] + cyclusy]);
-      return 0;
+                       r_to_grid[first_appearence[grid] + cyclusy + 1])
+                << '\n';
+      // return 0;
+      break;
     }
     setGrids.insert(grid);
     first_appearence[grid] = r;
@@ -201,8 +192,6 @@ int main() {
 
     for (int i = 0; i < 4; i++) {
       move_rocks_p2(grid, dirs[i]);
-      // print_grid(grid);
-      // std::cout << "\n\n";
     }
   }
 
