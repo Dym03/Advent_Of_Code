@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <type_traits>
 #include <vector>
 
 enum GridTile {
@@ -170,30 +171,36 @@ int main() {
   std::vector<std::vector<GridTile>> grid = initiliaz_grid(lines);
   print_grid(grid);
   long cyclusy = 1000000000;
-  cyclusy -= 460;
-  int brambora = cyclusy % 280;
+  int brambora = cyclusy % 7;
   int pos = 280 - brambora;
   int cycles = 0;
   Direction dirs[4] = {North, West, South, East};
   std::cout << "\n\n";
   std::map<int, int> map_preassure_cycles;
+  std::map<std::vector<std::vector<GridTile>>, int> first_appearence;
+  std::map<int, std::vector<std::vector<GridTile>>> r_to_grid;
   std::ofstream output("output.txt");
   // Part 1 move_rocks(grid);
+
   for (int r = 0; r < cyclusy; r++) {
+    std::cout << r << ' ' << calculate_preassure(grid) << '\n';
+    if (setGrids.count(grid) > 0) {
+      std::cout << r << " " << brambora << " " << first_appearence[grid]
+                << "\n";
+      int length = (r - first_appearence[grid]);
+      cyclusy -= (r + 1);
+      cyclusy %= length;
+      std::cout << cyclusy << '\n';
+      std::cout << calculate_preassure(
+          r_to_grid[first_appearence[grid] + cyclusy]);
+      return 0;
+    }
+    setGrids.insert(grid);
+    first_appearence[grid] = r;
+    r_to_grid[r] = grid;
+
     for (int i = 0; i < 4; i++) {
       move_rocks_p2(grid, dirs[i]);
-      long preassure = calculate_preassure(grid);
-      output << preassure << " " << ' ' << pos << '\n';
-      if (setGrids.count(grid) == 1) {
-        map_preassure_cycles[preassure] = cycles;
-      }
-      if (setGrids.count(grid) > 1) {
-        output << preassure << " " << cycles << " "
-               << map_preassure_cycles[preassure] << " " << pos << "\n";
-        return 0;
-      }
-      cycles += 1;
-      setGrids.insert(grid);
       // print_grid(grid);
       // std::cout << "\n\n";
     }
