@@ -18,6 +18,6 @@ fi
 cd Advent_$1
 mkdir Day_$2
 cd Day_$2
-touch main.cpp
+cp ../../Utils/template.cpp main.cpp
 touch test.txt
 python ../../Utils/get_inputs.py $1 $2
