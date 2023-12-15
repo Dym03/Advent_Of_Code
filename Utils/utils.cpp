@@ -43,6 +43,8 @@ template <typename T> void print_vector(std::vector<T> inp, bool newline) {
     std::cout << a;
     if (newline) {
       std::cout << '\n';
+    } else {
+      std::cout << ' ';
     }
   }
   std::cout << '\n';
