@@ -69,7 +69,7 @@ int main() {
       }
     }
   }
-
+  // Part 2
   grid[0][0] = On;
   stuck.insert({0, 0});
   grid[0][grid[0].size() - 1] = On;
@@ -78,6 +78,7 @@ int main() {
   stuck.insert({grid.size() - 1, 0});
   grid[grid.size() - 1][grid[0].size() - 1] = On;
   stuck.insert({grid.size() - 1, grid[0].size() - 1});
+
   int num_steps = 100;
   int on_neighbours = 0;
   std::vector<std::pair<std::pair<int, int>, LightState>> update_lights;

@@ -23,7 +23,6 @@ int get_combinations(std::vector<std::pair<State, int>> &contrainers,
       if (int(seq.size()) == 4) {
         amth += 1;
       }
-      std::cout << seq.size() << ' ';
       min = std::min(min, int(seq.size()));
     }
     return 1;
