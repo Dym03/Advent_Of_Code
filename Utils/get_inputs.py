@@ -6,12 +6,13 @@ year = sys.argv[1]
 day = sys.argv[2]
 URL = f"https://adventofcode.com/{year}/day/{day}/input"
 
-cookie = {'session':'53616c7465645f5f18fa22075973209a223c2afb77b0398ca1b976ede689e4e5e8011f649dc6c0a20bdf8fa6c581376cc852051ab54acddac8b4a5aee725f8d3'}
+cookie = {
+    "session": "53616c7465645f5f8adcdcadf72769dbe2e247ade9baa5399f0a4f39a2dd722dd1cab365d85342df8bfae4231cdd5beee09632a7e3c3880dd35fddad59558979"
+}
 
 page = requests.post(URL, cookies=cookie)
 
-input = BeautifulSoup(page.content, 'html.parser')
+input = BeautifulSoup(page.content, "html.parser")
 
-with open('input.txt', 'w+') as file:
+with open("input.txt", "w+") as file:
     file.write(input.text.rstrip())
-

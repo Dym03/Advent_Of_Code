@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <unordered_map>
 
 #include "../../Utils/utils.cpp"
 
@@ -6,10 +7,16 @@ int main() {
     std::vector<std::string> lines = read_lines();
     std::vector<int> left_nums = {};
     std::vector<int> right_nums = {};
+    std::unordered_map<int, int> right_map = {};
     for (auto line : lines) {
         std::vector<std::string> words = split(' ', line);
         left_nums.push_back(std::stoi(words[0]));
         right_nums.push_back(std::stoi(words[1]));
+        if (right_map.find(std::stoi(words[1])) == right_map.end()) {
+            right_map[std::stoi(words[1])] = 1;
+        } else {
+            right_map[std::stoi(words[1])] += 1;
+        }
     }
     std::sort(left_nums.begin(), left_nums.end());
     std::sort(right_nums.begin(), right_nums.end());
@@ -25,13 +32,14 @@ int main() {
     for (auto num : left_nums) {
         int count = 0;
 
-        for (auto i = std::find(right_nums.begin(), right_nums.end(), num); i < std::find(right_nums.begin(), right_nums.end(), num + 1); i++) {
-            if (*i > num) {
-                break;
-            }
-            count += 1;
-        }
-        sum_similarities += num * count;
+        // for (auto i = std::find(right_nums.begin(), right_nums.end(), num); i < std::find(right_nums.begin(), right_nums.end(), num + 1); i++) {
+        //     if (*i > num) {
+        //         break;
+        //     }
+        //     count += 1;
+        // }
+        // sum_similarities += num * count;
+        sum_similarities += num * right_map[num];
     }
     std::cout << sum_similarities << std::endl;
 
