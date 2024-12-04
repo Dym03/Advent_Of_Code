@@ -15,7 +15,6 @@ int main() {
             continue;
         }
         bool differ = true;
-        int idx_differ = 0;
         row_type prev_type = None;
         for (int i = 0; i < tokens.size() - 1; i++) {
             int act = std::stoi(tokens[i]);
@@ -23,24 +22,20 @@ int main() {
             if (act < next) {
                 if (prev_type == Decreasing) {
                     differ = false;
-                    idx_differ = i + 1;
                 } else {
                     prev_type = Increasing;
                 }
             } else if (act > next) {
                 if (prev_type == Increasing) {
                     differ = false;
-                    idx_differ = i + 1;
                 } else {
                     prev_type = Decreasing;
                 }
             } else if (act == next) {
                 differ = false;
-                idx_differ = i + 1;
             }
             if (abs(act - next) > 3) {
                 differ = false;
-                idx_differ = i + 1;
             }
         }
         if ((differ && tokens.size() > 1)) {
@@ -58,24 +53,20 @@ int main() {
                 if (act < next) {
                     if (prev_type == Decreasing) {
                         differ = false;
-                        idx_differ = i + 1;
                     } else {
                         prev_type = Increasing;
                     }
                 } else if (act > next) {
                     if (prev_type == Increasing) {
                         differ = false;
-                        idx_differ = i + 1;
                     } else {
                         prev_type = Decreasing;
                     }
                 } else if (act == next) {
                     differ = false;
-                    idx_differ = i + 1;
                 }
                 if (abs(act - next) > 3) {
                     differ = false;
-                    idx_differ = i + 1;
                 }
             }
             if ((differ && tokens.size() > 1)) {
