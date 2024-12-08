@@ -2,7 +2,7 @@
 
 #include "../../Utils/utils.cpp"
 
-void compute_antinodes(std::unordered_map<char, std::vector<std::pair<int, int>>> antennas, Grid<int>& antinodes) {
+void compute_antinodes(std::unordered_map<char, std::vector<std::pair<int, int>>> antennas, Grid<int>& antinodes, bool p_2 = false) {
     for (auto k_v : antennas) {
         for (auto antena : k_v.second) {
             for (auto antena_2 : k_v.second) {
@@ -11,12 +11,15 @@ void compute_antinodes(std::unordered_map<char, std::vector<std::pair<int, int>>
                 }
                 int drow = antena_2.first - antena.first;
                 int dcol = antena_2.second - antena.second;
-                int t = 0;
+                int t = !p_2 ? 1 : 0;
                 while (1) {
                     if (antena_2.first + drow * t < 0 || antena_2.first + drow * t > antinodes.get_row_size() - 1 || antena_2.second + dcol * t < 0 || antena_2.second + dcol * t > antinodes.get_col_size() - 1) {
                         break;
                     }
                     antinodes.set(antena_2.first + drow * t, antena_2.second + dcol * t, antinodes.get(antena_2.first + drow * t, antena_2.second + dcol * t) + 1);
+                    if (!p_2) {
+                        break;
+                    }
                     t += 1;
                 }
             }
@@ -37,16 +40,22 @@ int main() {
             }
         }
     }
+    auto antinodes_p_2 = antinodes;
     compute_antinodes(antennas, antinodes);
-    antinodes.print();
+    compute_antinodes(antennas, antinodes_p_2, true);
     int total = 0;
-    for (auto line : antinodes.grid) {
-        for (auto num : line) {
-            if (num > 0) {
+    int total_p_2 = 0;
+    for (int row = 0; row < antinodes.get_row_size(); row++) {
+        for (int col = 0; col < antinodes.get_col_size(); col++) {
+            if (antinodes.get(row, col) > 0) {
                 total += 1;
+            }
+            if (antinodes_p_2.get(row, col) > 0) {
+                total_p_2 += 1;
             }
         }
     }
-    std::cout << "Total = " << total << '\n';
+    std::cout << "Total Part 1 = " << total << '\n';
+    std::cout << "Total Part 2 = " << total_p_2 << '\n';
     return 0;
 }
