@@ -5,15 +5,15 @@
 
 #include "../../Utils/utils.cpp"
 
-std::vector<Point> find_component(Point root, std::set<Point>& seen, std::unordered_map<Point, std::vector<Point>>& adjency_list) {
+std::set<Point> find_component(Point root, std::set<Point>& seen, std::unordered_map<Point, std::vector<Point>>& adjency_list) {
     std::queue<Point> Q;
-    std::vector<Point> component;
+    std::set<Point> component;
     seen.insert(root);
     Q.push(root);
     while (!Q.empty()) {
         Point v = Q.front();
         Q.pop();
-        component.push_back(v);
+        component.insert(v);
         for (auto point : adjency_list[v]) {
             if (seen.count(point) == 0) {
                 seen.insert(point);
@@ -24,15 +24,15 @@ std::vector<Point> find_component(Point root, std::set<Point>& seen, std::unorde
     return component;
 }
 
-std::vector<std::vector<Point>> find_all_components(Grid<char> G, std::unordered_map<Point, std::vector<Point>>& adjency_list, std::set<Point>& seen) {
-    std::vector<std::vector<Point>> components;
+std::vector<std::set<Point>> find_all_components(Grid<char> G, std::unordered_map<Point, std::vector<Point>>& adjency_list, std::set<Point>& seen) {
+    std::vector<std::set<Point>> components;
     for (int i = 0; i < G.get_row_size(); i++) {
         for (int j = 0; j < G.get_col_size(); j++) {
             Point p = {i, j};
             if (seen.count(p) > 0) {
                 continue;
             }
-            std::vector<Point> component = find_component(p, seen, adjency_list);
+            std::set<Point> component = find_component(p, seen, adjency_list);
             components.push_back(component);
         }
     }
@@ -59,30 +59,7 @@ void get_adjency_list(Grid<char> G, std::unordered_map<Point, std::vector<Point>
     }
 }
 
-// Doesnt work for not convex parts
-std::tuple<int, int, int, int> find_component_bbox(std::vector<Point>& component) {
-    int max_x = INT_MIN;
-    int max_y = INT_MIN;
-    int min_x = INT_MAX;
-    int min_y = INT_MAX;
-    for (auto p : component) {
-        if (p.x < min_x) {
-            min_x = p.x;
-        }
-        if (p.x > max_x) {
-            max_x = p.x;
-        }
-        if (p.y < min_y) {
-            min_y = p.y;
-        }
-        if (p.y > max_y) {
-            max_y = p.y;
-        }
-    }
-    return {min_x, max_x, min_y, max_y};
-}
-
-int num_edges(std::vector<Point>& edge_points, std::unordered_map<Point, std::vector<Point>>& adj_list) {
+int num_edges(std::set<Point>& edge_points, std::unordered_map<Point, std::vector<Point>>& adj_list) {
     int num_edges = 0;
     for (auto component : edge_points) {
         if (adj_list[component].size() == 2) {
@@ -99,15 +76,51 @@ int num_edges(std::vector<Point>& edge_points, std::unordered_map<Point, std::ve
     return num_edges;
 }
 
-std::vector<Point> get_edge_points(std::vector<Point> component, std::unordered_map<Point, std::vector<Point>>& adj_list) {
-    std::vector<Point> edge_points = {};
+std::set<Point> get_edge_points(std::set<Point> component, std::unordered_map<Point, std::vector<Point>>& adj_list) {
+    std::set<Point> edge_points = {};
     for (auto point : component) {
         if (adj_list[point].size() == 4) {
             continue;
         }
-        edge_points.push_back(point);
+        edge_points.insert(point);
     }
     return edge_points;
+}
+
+// Solution for P2 inspired by https://www.youtube.com/watch?v=glNiVe_Rztg
+std::set<std::pair<Point, Point>> get_perimetr(std::set<Point> component, Grid<char>& G) {
+    std::set<std::pair<Point, Point>> perimeter;
+    std::vector<Direction> directions = {UP, DOWN, LEFT, RIGHT};
+    for (auto node : component) {
+        for (auto dir : directions) {
+            auto dir_point = get_direction_from_enum(dir);
+            Point d_node = node + dir_point;
+            // If the node is on the border of the grid, or it is not touching other node in the direction then add it to the list, for p1 just perimetr += 1
+            if (d_node.x < 0 || d_node.x > G.get_row_size() || d_node.y < 0 || d_node.y > G.get_col_size() || component.count(d_node) == 0) {
+                perimeter.insert({node, d_node});
+            }
+        }
+    }
+
+    // Now we have to get rid of the perimetrs that are not needed, we just keep the last of the perimetr in the direction
+    std::set<std::pair<Point, Point>> perimeter_2;
+    directions.clear();
+    directions = {DOWN, RIGHT};
+    for (auto node : perimeter) {
+        bool keep = true;
+        for (auto dir : directions) {
+            auto dir_point = get_direction_from_enum(dir);
+            Point p1_n = node.first + dir_point;
+            Point p2_n = node.second + dir_point;
+            if (perimeter.count({p1_n, p2_n}) > 0) {
+                keep = false;
+            }
+        }
+        if (keep) {
+            perimeter_2.insert({node.first, node.second});
+        }
+    }
+    return perimeter_2;
 }
 
 int main() {
@@ -125,23 +138,25 @@ int main() {
     get_adjency_list(grid, adjency_list);
     grid.print();
     auto components = find_all_components(grid, adjency_list, seen);
-    size_t total = 0;
+    size_t total_p_1 = 0;
+    size_t total_p_2 = 0;
     for (auto component : components) {
-        print_vector(component, ' ');
-        auto bbox = find_component_bbox(component);
-        std::vector<Point> edge_points = get_edge_points(component, adjency_list);
+        std::set<Point> edge_points = get_edge_points(component, adjency_list);
         std::cout << "Edge Points : ";
-        print_vector(edge_points, ' ');
         int edges_count = num_edges(edge_points, adjency_list);
+        auto perim_2 = get_perimetr(component, grid);
+        std::cout << "Perimetr 2 = " << perim_2.size() << std::endl;
         int area = component.size();
         std::cout << "Num edges = " << edges_count << std::endl;
         if (area == 1) {
-            total += 4;
+            total_p_1 += 4;
         } else {
-            total += area * edges_count;
+            total_p_1 += area * edges_count;
         }
+        total_p_2 += area * perim_2.size();
     }
-    std::cout << total << std::endl;
+    std::cout << total_p_1 << std::endl;
+    std::cout << total_p_2 << std::endl;
 
     return 0;
 }
