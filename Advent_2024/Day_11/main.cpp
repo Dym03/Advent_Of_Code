@@ -47,13 +47,16 @@ int main() {
     print_vector(stones, ' ');
     int num_blinks = 25;
     std::vector<std::string> new_stones;
+    std::unordered_map<unsigned long long, unsigned long long> stone_to_stone_count;
 
     std::vector<unsigned long long> stones_long;
     for (auto stone : stones) {
         stones_long.push_back(std::stoull(stone));
+        stone_to_stone_count[std::stoull(stone)] = 1;
     }
     std::vector<unsigned long long> new_stones_long;
     std::unordered_map<std::pair<unsigned long long, int>, unsigned long long, hash_pair> stone_to_num_stones;
+
     new_stones.reserve(stones.size());
     // Part 1
     for (int i = 0; i < num_blinks; i++) {
