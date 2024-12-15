@@ -141,6 +141,7 @@ template <typename T>
 class Grid {
    public:
     std::vector<std::vector<T>> grid;
+    Grid() { grid = {}; }
     Grid(int rows, int cols, T fill_value) {
         grid = std::vector<std::vector<T>>(rows, std::vector<T>(cols, fill_value));
     }
