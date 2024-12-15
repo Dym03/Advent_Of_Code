@@ -2,7 +2,7 @@
 
 #include "../../Utils/utils.cpp"
 
-std::pair<int, int> get_direction_from_enum(Direction dir) {
+std::pair<int, int> get_direction_from_enum_2(Direction dir) {
     if (dir == UP) {
         return {-1, 0};
     } else if (dir == DOWN) {
@@ -20,7 +20,7 @@ int travel_one_trail(Grid<int>& grid, std::pair<int, int> act_pos, Direction dir
     if (visited.find({act_pos, dir}) != visited.end()) {
         return 0;
     }
-    std::pair<int, int> direction = get_direction_from_enum(dir);
+    std::pair<int, int> direction = get_direction_from_enum_2(dir);
     visited.insert({act_pos, dir});
     act_pos.first += direction.first;
     act_pos.second += direction.second;

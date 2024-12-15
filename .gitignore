@@ -3,3 +3,6 @@
 !*/
 .vscode/
 *.txt
+*.o
+*.hi
+*.out

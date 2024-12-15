@@ -11,8 +11,6 @@ enum GridType {
     BOXRIGHT,
 };
 
-Point move_one_step_p2(Point dir, Point act_pos, Grid<GridType>& G);
-
 Point move_one_step(Point dir, Point act_pos, Grid<GridType>& G) {
     Point new_pos = act_pos + dir;
     if (new_pos.x < 0 || new_pos.x > G.get_row_size() - 1 || new_pos.y < 0 || new_pos.y > G.get_col_size() - 1) {
@@ -46,58 +44,6 @@ void run_simulation(Point act_pos, Grid<GridType>& G, std::vector<Direction> ste
         Point dx = get_direction_from_enum(dir);
         act_pos = move_one_step(dx, act_pos, G);
     }
-}
-
-bool can_move_one_step_p2(Point dir, Point act_pos, Grid<GridType> G) {
-    Point new_pos = act_pos + dir;
-    if (new_pos.x < 0 || new_pos.x > G.get_row_size() - 1 || new_pos.y < 0 || new_pos.y > G.get_col_size() - 1) {
-        return false;
-    }
-    if (G.get(new_pos.x, new_pos.y) == WALL) {
-        return false;
-    }
-    GridType act_type = G.get(act_pos.x, act_pos.y);
-    if (G.get(new_pos.x, new_pos.y) == EMPTY && act_type == ROBOT) {
-        GridType act_type = G.get(act_pos.x, act_pos.y);
-        G.set(act_pos.x, act_pos.y, EMPTY);
-        G.set(new_pos.x, new_pos.y, act_type);
-        return true;
-    }
-    if (G.get(new_pos.x, new_pos.y) == EMPTY && act_type == BOXLEFT) {
-        GridType act_type = G.get(act_pos.x, act_pos.y);
-        G.set(act_pos.x, act_pos.y, EMPTY);
-        G.set(new_pos.x, new_pos.y, act_type);
-        return true;
-    }
-    if (G.get(new_pos.x, new_pos.y) == EMPTY && act_type == BOXRIGHT) {
-        GridType act_type = G.get(act_pos.x, act_pos.y);
-        G.set(act_pos.x, act_pos.y, EMPTY);
-        G.set(new_pos.x, new_pos.y, act_type);
-        return true;
-    }
-    if (G.get(new_pos.x, new_pos.y) == BOXLEFT) {
-        if (can_move_one_step_p2(dir, new_pos + Point{0, 1}, G) && can_move_one_step_p2(dir, new_pos, G)) {
-            GridType act_type = G.get(act_pos.x, act_pos.y);
-            G.set(act_pos.x, act_pos.y, EMPTY);
-            G.set(new_pos.x, new_pos.y, act_type);
-            return true;
-        } else {
-            return false;
-        }
-    }
-    if (G.get(new_pos.x, new_pos.y) == BOXRIGHT) {
-        if (can_move_one_step_p2(dir, new_pos + Point{0, -1}, G) && can_move_one_step_p2(dir, new_pos, G)) {
-            GridType act_type = G.get(act_pos.x, act_pos.y);
-            G.set(act_pos.x, act_pos.y, EMPTY);
-            G.set(new_pos.x, new_pos.y, act_type);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    std::cout << "Something went wrong\n";
-    return false;
 }
 
 Point move_one_step_p2(Point dir, Point act_pos, Grid<GridType>& G) {
@@ -157,6 +103,13 @@ Point move_one_step_p2(Point dir, Point act_pos, Grid<GridType>& G) {
     return act_pos;
 }
 
+void run_simulation_p2(Point act_pos, Grid<GridType>& G, std::vector<Direction> steps) {
+    for (auto dir : steps) {
+        Point dx = get_direction_from_enum(dir);
+        act_pos = move_one_step_p2(dx, act_pos, G);
+    }
+}
+
 void print_grid(Grid<GridType>& G) {
     for (int i = 0; i < G.get_row_size(); i++) {
         for (int j = 0; j < G.get_col_size(); j++) {
@@ -176,13 +129,6 @@ void print_grid(Grid<GridType>& G) {
             }
         }
         std::cout << '\n';
-    }
-}
-
-void run_simulation_p2(Point act_pos, Grid<GridType>& G, std::vector<Direction> steps) {
-    for (auto dir : steps) {
-        Point dx = get_direction_from_enum(dir);
-        act_pos = move_one_step_p2(dx, act_pos, G);
     }
 }
 
