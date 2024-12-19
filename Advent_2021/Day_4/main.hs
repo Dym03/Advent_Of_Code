@@ -42,22 +42,9 @@ findSolution_p2 used_nums boards nums solved = do
   let used_nums' = used_nums ++ [num]
   findSolution_p2 used_nums' boards'' (tail nums) solved'
 
--- findSolution_p2 used_nums boards [] solved = 0
--- findSolution_p2 used_nums [] _ solved = read $ last used_nums
--- findSolution_p2 used_nums boards nums solved = do
---   let num = head nums
---   let boards' = markBoards boards num
---   let newly_solved = filter isSolved boards'
---   let solved' = solved ++ newly_solved
---   let boards'' = filter (\x -> notElem x solved') boards'
---   let used_nums' = used_nums ++ [num]
---   findSolution_p2 used_nums' boards'' (tail nums) solved'
-
 getSumOfBoard :: [[String]] -> Int
 getSumOfBoard [] = 0
 getSumOfBoard board = sum $ map read $ filter (/= "X") $ concat board
-
--- isSolved :: [[String]] -> Bool
 
 isSolved [] = False
 isSolved board = do

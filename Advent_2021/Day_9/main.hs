@@ -58,5 +58,5 @@ main = do
   input <- readFile "input.txt"
   let input' = lines input
 
-  print $ solveP1 input'
-  print $ solveP2 input'
+  print $ "Part 1 = " ++ show (solveP1 input')
+  print $ "Part 2 = " ++ show (solveP2 input')
