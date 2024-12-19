@@ -39,11 +39,19 @@ std::vector<std::string> split(char delim, std::string input) {
 }
 
 template <typename T>
-void print_vector(std::vector<T> inp, char delim) {
-    for (auto a : inp) {
-        std::cout << a << delim;
+void print_vector(std::vector<T> inp, char delim, bool newline=true) {
+    std::cout << '[';
+    for (int i = 0; i < inp.size(); i++) {
+        if (i != inp.size() - 1) {
+            std::cout << inp[i] << delim;
+            continue;
+        }
+        std::cout << inp[i];
     }
-    std::cout << '\n';
+    std::cout << ']';
+    if (newline) {
+        std::cout << '\n';
+    }
 }
 
 template <typename T>
@@ -57,6 +65,7 @@ void print_grid(std::vector<std::vector<T>> grid, char delim) {
 struct Point {
     int x;
     int y;
+    Point() : x(0), y(0) {}
     Point(int x, int y) : x(x), y(y) {}
 
     Point operator+(const Point &other) const {

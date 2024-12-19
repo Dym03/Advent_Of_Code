@@ -90,31 +90,6 @@ std::unordered_map<Point, int> dijkstra(Grid<GridType>& grid, Point start, Point
     return distances;
 }
 
-void dfs(Grid<GridType>& g, Point act_pos, Point end, int length, std::set<Point> visited) {
-    if (length > min_lenght) {
-        return;
-    }
-    if (act_pos.x < 0 || act_pos.x > g.get_row_size() - 1 || act_pos.y < 0 || act_pos.y > g.get_col_size() - 1) {
-        return;
-    }
-    if (g.get(act_pos.x, act_pos.y) == WALL) {
-        return;
-    }
-    if (act_pos == end) {
-        min_lenght = std::min(min_lenght, length);
-        std::cout << "New min length = " << min_lenght << std::endl;
-    }
-    if (visited.count(act_pos) > 0) {
-        return;
-    }
-    visited.insert(act_pos);
-    // std::cout << act_pos << std::endl;
-    for (auto dir : {UP, DOWN, LEFT, RIGHT}) {
-        Point dx = get_direction_from_enum(dir);
-        dfs(g, act_pos + dx, end, length + 1, visited);
-    }
-}
-
 int main() {
     std::vector<std::string> lines = read_lines();
     std::vector<Point> blocks;
