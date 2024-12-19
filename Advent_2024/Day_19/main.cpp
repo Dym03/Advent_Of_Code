@@ -9,25 +9,6 @@
 
 #include "../../Utils/utils.cpp"
 
-bool find_solutions(std::string pattern, std::set<std::string>& unique_patterns, size_t max_pattern_length) {
-    if (pattern.size() == 0) {
-        return true;
-    }
-    std::string act_substr = "";
-    std::vector<bool> solutions = {};
-    for (int i = 0; i < max_pattern_length; i++) {
-        act_substr += pattern[i];
-        if (unique_patterns.count(act_substr) > 0) {
-            solutions.push_back(find_solutions(pattern.substr(i + 1), unique_patterns, max_pattern_length));
-            if (solutions.back() == true) {
-                break;
-            }
-        }
-    }
-
-    return std::count(solutions.begin(), solutions.end(), true) > 0;
-}
-
 std::unordered_map<std::string, long long> cache;
 
 long find_solutions_p2(std::string pattern, std::set<std::string>& unique_patterns, size_t max_pattern_length) {
@@ -72,11 +53,10 @@ int main() {
             continue;
         }
 
-        if (find_solutions(lines[i], unique_patterns, max_pattern_length)) {
+        long solutions = find_solutions_p2(lines[i], unique_patterns, max_pattern_length);
+        if (solutions > 0) {
             count += 1;
         }
-        long solutions = find_solutions_p2(lines[i], unique_patterns, max_pattern_length);
-
         count_p2 += solutions;
     }
     std::cout << "Part 1 = " << count << std::endl;
