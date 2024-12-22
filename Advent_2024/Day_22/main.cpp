@@ -28,6 +28,7 @@ int main() {
     std::vector<std::string> lines = read_lines();
     long long secret_sum = 0;
     std::unordered_map<std::vector<int>, int, VectorHasher> diff_to_price = {};
+    int max_count = 0;
     for (auto line : lines) {
         std::vector<int> diffs = {};
         long secret_num = std::stol(line);
@@ -42,17 +43,12 @@ int main() {
                 if (diff_set.count(diffs) == 0) {
                     diff_to_price[diffs] += new_price;
                     diff_set.insert(diffs);
+                    max_count = std::max(max_count, diff_to_price[diffs]);
                 }
                 diffs.erase(diffs.begin());
             }
         }
         secret_sum += secret_num;
-    }
-    int max_count = 0;
-    for (auto [k, v] : diff_to_price) {
-        if (v > max_count) {
-            max_count = v;
-        }
     }
 
     std::cout << "Secret sum: " << secret_sum << std::endl;
