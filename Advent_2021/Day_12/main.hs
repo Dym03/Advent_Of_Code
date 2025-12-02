@@ -2,8 +2,6 @@ module Main where
 
 import Data.Char (isLower)
 import Data.Text (pack, splitOn, unpack)
-import Debug.Trace (trace)
-import Text.XHtml (small)
 
 parseLine :: String -> (String, String)
 parseLine line = (a', b')

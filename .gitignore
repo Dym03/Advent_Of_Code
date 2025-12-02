@@ -6,4 +6,4 @@
 *.o
 *.hi
 *.out
-*/target
+**/target

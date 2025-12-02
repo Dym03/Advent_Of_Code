@@ -48,6 +48,7 @@ void part_1(std::unordered_map<std::string, std::set<std::string>>& adj_computer
 
 std::vector<std::set<std::string>> cliques;
 
+// https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm
 void BronKerbosch(std::set<std::string> R, std::set<std::string> P, std::set<std::string> X, std::unordered_map<std::string, std::set<std::string>>& adj_computers) {
     if (P.empty() && X.empty()) {
         cliques.push_back(R);
